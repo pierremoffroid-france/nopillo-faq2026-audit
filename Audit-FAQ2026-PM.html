@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit FAQ Nopillo — Pierre, Head of Customer Operations</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --surface2: #f0f2f5;
+    --border: #e2e6ed;
+    --accent: #b5860d;
+    --accent2: #2563eb;
+    --accent3: #0d9488;
+    --red: #dc2626;
+    --green: #16a34a;
+    --orange: #d97706;
+    --text: #111827;
+    --muted: #6b7280;
+    --serif: 'DM Serif Display', serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* HEADER */
+  .site-header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(245,246,248,0.97);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .site-header .logo {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+  .site-header .meta {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* NAV */
+  .side-nav {
+    position: fixed; left: 0; top: 60px; bottom: 0;
+    width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 24px 0;
+    z-index: 50;
+  }
+  .side-nav a {
+    display: block; padding: 8px 24px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 500;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .side-nav a:hover, .side-nav a.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(232,201,109,0.06);
+  }
+  .side-nav .nav-section {
+    padding: 16px 24px 6px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  /* MAIN */
+  .main-content {
+    margin-left: 220px;
+    padding: 48px 56px;
+    max-width: 1200px;
+  }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 80px;
+    scroll-margin-top: 80px;
+  }
+  .section-header {
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-tag {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-size: 32px;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .section-desc {
+    margin-top: 12px;
+    color: var(--muted);
+    max-width: 700px;
+    font-size: 14px;
+  }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .kpi-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .kpi-card .kpi-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .kpi-card .kpi-value {
+    font-family: var(--serif);
+    font-size: 36px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .kpi-card .kpi-sub {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .kpi-card.alert .kpi-value { color: var(--red); }
+  .kpi-card.good .kpi-value { color: var(--green); }
+  .kpi-card.warn .kpi-value { color: var(--orange); }
+  .kpi-card.info .kpi-value { color: var(--accent2); }
+
+  /* RATIO INDICATOR */
+  .ratio-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .ratio-badge.bad { background: rgba(220,38,38,0.08); color: #dc2626; border: 1px solid rgba(220,38,38,0.25); }
+  .ratio-badge.good { background: rgba(22,163,74,0.08); color: #16a34a; border: 1px solid rgba(22,163,74,0.25); }
+
+  /* TABLES */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .data-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .data-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(226,230,237,0.8);
+    vertical-align: top;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tbody tr:hover { background: rgba(0,0,0,0.02); }
+
+  /* BADGES */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-p1 { background: rgba(220,38,38,0.1); color: #dc2626; }
+  .badge-p2 { background: rgba(217,119,6,0.12); color: #d97706; }
+  .badge-ok { background: rgba(22,163,74,0.12); color: #16a34a; }
+  .badge-partial { background: rgba(37,99,235,0.1); color: #2563eb; }
+  .badge-none { background: rgba(220,38,38,0.1); color: #dc2626; }
+  .badge-star { background: rgba(181,134,13,0.12); color: #b5860d; }
+  .badge-archive { background: rgba(107,114,128,0.12); color: #6b7280; }
+  .badge-update { background: rgba(217,119,6,0.12); color: #d97706; }
+  .badge-invisible { background: rgba(13,148,136,0.1); color: #0d9488; }
+
+  /* CALLOUTS */
+  .callout {
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-left: 3px solid;
+    font-size: 13.5px;
+  }
+  .callout.red { background: rgba(220,38,38,0.06); border-color: var(--red); }
+  .callout.orange { background: rgba(217,119,6,0.07); border-color: var(--orange); }
+  .callout.blue { background: rgba(37,99,235,0.06); border-color: var(--accent2); }
+  .callout.green { background: rgba(22,163,74,0.07); border-color: var(--green); }
+  .callout.gold { background: rgba(181,134,13,0.07); border-color: var(--accent); }
+  .callout strong { font-weight: 600; }
+
+  /* CHART CONTAINERS */
+  .chart-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin: 24px 0;
+  }
+  .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 20px;
+  }
+  .charts-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* CLUSTER CARDS */
+  .cluster-grid {
+    display: grid;
+    gap: 16px;
+  }
+  .cluster-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 16px;
+    align-items: start;
+  }
+  .cluster-code {
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--accent);
+  }
+  .cluster-name { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+  .cluster-examples { font-size: 12px; color: #4b5563; font-style: italic; }
+  .cluster-vol {
+    text-align: right;
+    white-space: nowrap;
+  }
+  .cluster-vol .vol-num {
+    font-family: var(--serif);
+    font-size: 28px;
+    color: var(--text);
+  }
+  .cluster-vol .vol-pct {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* BLOCK THEMATIC */
+  .block-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .block-card .block-name { font-weight: 600; font-size: 14px; }
+  .block-card .block-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .block-stats { display: flex; gap: 24px; text-align: right; }
+  .block-stat-val { font-family: var(--serif); font-size: 24px; }
+  .block-stat-label { font-size: 11px; color: var(--muted); }
+
+  /* RECOMMENDATION CARDS */
+  .rec-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+  .rec-card .rec-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px;
+  }
+  .rec-card .rec-title { font-family: var(--serif); font-size: 20px; }
+  .rec-card .rec-meta { font-size: 12px; color: var(--muted); }
+  .rec-card .plan-list {
+    list-style: none;
+    display: grid; gap: 6px;
+    margin: 12px 0;
+  }
+  .rec-card .plan-list li {
+    padding: 8px 12px;
+    background: #f5f7fb;
+    border-radius: 6px;
+    font-size: 13px;
+    display: flex; gap: 10px;
+  }
+  .rec-card .plan-list li::before {
+    content: '→';
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .ticket-quote {
+    background: #f0f4ff;
+    border-left: 2px solid var(--accent2);
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    color: #374151;
+    margin: 6px 0;
+    font-style: italic;
+  }
+
+  /* ARCHITECTURE */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .arch-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .arch-emoji { font-size: 28px; margin-bottom: 10px; }
+  .arch-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .arch-logic { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .arch-count { font-size: 12px; }
+  .arch-count span { color: var(--accent); font-weight: 600; }
+
+  /* VERIFICATION TABLE */
+  .verif-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .verif-table tr {
+    border-bottom: 1px solid var(--border);
+  }
+  .verif-table td {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+  .verif-table td:first-child { color: var(--muted); width: 60%; }
+  .verif-table td:last-child { font-weight: 600; color: var(--text); text-align: right; }
+
+  /* ANNEXE */
+  .annexe-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  .annexe-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .annexe-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(226,230,237,0.6);
+    vertical-align: top;
+  }
+  .tag-p1 { color: #ff6b6b; font-weight: 700; }
+  .tag-p2 { color: #ff9f43; font-weight: 700; }
+  .tag-maj { color: #51cf66; font-weight: 700; }
+
+  /* DIVIDER */
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* PRINT */
+  @media print {
+    .side-nav, .site-header { display: none; }
+    .main-content { margin-left: 0; padding: 20px; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-2col { grid-template-columns: 1fr; }
+    .arch-grid { grid-template-columns: 1fr; }
+  }
+
+  /* SCROLL */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #c9d0db; border-radius: 3px; }
+
+  p { margin-bottom: 12px; color: var(--text); }
+  h3 { font-family: var(--serif); font-size: 22px; margin: 24px 0 12px; }
+  h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 20px 0 10px; }
+
+  .big-number {
+    font-family: var(--serif);
+    font-size: 56px;
+    line-height: 1;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo">Nopillo — Audit FAQ</div>
+  <div class="meta">Pierre, Head of Customer Operations · Février 2026 · Confidentiel</div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="side-nav">
+  <div class="nav-section">Vue d'ensemble</div>
+  <a href="#dashboard" onclick="scrollTo('dashboard')">📊 Dashboard</a>
+  <a href="#step0">Étape 0 — Consolidation</a>
+  <div class="nav-section">Analyse</div>
+  <a href="#step1">Étape 1 — Pré-classification</a>
+  <a href="#step2">Étape 2 — Clusters</a>
+  <a href="#step3">Étape 3 — Métriques FAQ</a>
+  <div class="nav-section">Synthèse</div>
+  <a href="#step4">Étape 4 — Diagnostic</a>
+  <a href="#step5">Étape 5 — Recommandations</a>
+  <a href="#step6">Étape 6 — Nouvelle archi</a>
+  <a href="#step7">Étape 7 — Vérification</a>
+  <div class="nav-section">Annexe</div>
+  <a href="#annexe">📋 Annexe — Nouveaux articles</a>
+</nav>
+
+<!-- MAIN -->
+<main class="main-content">
+
+<!-- ============================================================ -->
+<!-- DASHBOARD -->
+<!-- ============================================================ -->
+<section class="section" id="dashboard">
+  <div class="section-header">
+    <div class="section-tag">Vue d'ensemble</div>
+    <h1 class="section-title">Audit & Refonte de la FAQ Nopillo</h1>
+    <p class="section-desc">Analyse exhaustive de 35 847 tickets support (janvier 2025 – février 2026) avec focus sur la période de mesure FAQ (septembre 2025 – février 2026 · 12 785 tickets post-V2) et des 110 articles FAQ existants, pour refonder l'architecture documentaire sur les intentions réelles des clients.</p>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card info">
+      <div class="kpi-label">Tickets sur la période de mesure</div>
+      <div class="kpi-value">12 785</div>
+      <div class="kpi-sub">1er sept. 2025 → fév. 2026 · Pipeline Customer Care</div>
+    </div>
+    <div class="kpi-card warn">
+      <div class="kpi-label">Clusters identifiés</div>
+      <div class="kpi-value">18</div>
+      <div class="kpi-sub">+1 résiduel C99 · Corpus complet 35 847 tickets (janv. 2025–fév. 2026)</div>
+    </div>
+    <div class="kpi-card info">
+      <div class="kpi-label">Total vues FAQ</div>
+      <div class="kpi-value">26 181</div>
+      <div class="kpi-sub">110 articles · 1er sept. 2025 → fév. 2026</div>
+    </div>
+    <div class="kpi-card warn">
+      <div class="kpi-value">2,05×</div>
+      <div class="kpi-sub">
+        <span class="ratio-badge bad">⚠ Insuffisant · Benchmark sain : 8–15×</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHART 1 : TOP 15 CLUSTERS -->
+  <div class="chart-wrap">
+    <div class="chart-title">Top 15 clusters par volume de tickets (intention clients)</div>
+    <canvas id="chartClusters" height="420"></canvas>
+  </div>
+
+  <!-- CHART 2 & 3 côte à côte -->
+  <div class="charts-2col">
+    <div class="chart-wrap">
+      <div class="chart-title">Répartition du corpus de tickets</div>
+      <canvas id="chartDonut" height="280"></canvas>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Top 10 articles FAQ par vues</div>
+      <canvas id="chartTopFAQ" height="280"></canvas>
+    </div>
+  </div>
+
+  <!-- CHART 4 : Scatter plot -->
+  <div class="chart-wrap">
+    <div class="chart-title">Matrice : Vues FAQ (X) vs Volume tickets (Y) — 4 quadrants d'action</div>
+    <canvas id="chartScatter" height="320"></canvas>
+  </div>
+
+  <!-- CHART 5 : Grouped bars -->
+  <div class="chart-wrap">
+    <div class="chart-title">Déséquilibre par thématique : volume tickets (demande) vs vues FAQ (offre documentaire)</div>
+    <canvas id="chartGrouped" height="280"></canvas>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- ÉTAPE 0 -->
+<!-- ============================================================ -->
+<section class="section" id="step0">
+  <div class="section-header">
+    <div class="section-tag">Étape 0</div>
+    <h1 class="section-title">Consolidation des fichiers</h1>
+  </div>
+
+  <div class="callout blue">
+    <strong>Rapport de consolidation :</strong> 45 fichiers lus · 132 230 lignes brutes · <strong>35 847 tickets uniques</strong> après déduplication sur l'ID du ticket · 96 383 doublons inter-fichiers écartés.
+  </div>
+
+  <p>La période couverte s'étend du <strong>1er janvier 2025 au 20 février 2026</strong> (13,7 mois pour le corpus tickets complet). La période de mesure des métriques FAQ couvre <strong>septembre 2025 à février 2026</strong> — soit 12 785 tickets dans notre corpus sur cette période (post-migration V2). Les 45 fichiers partagent une structure identique : ID, date, pipeline, description, corps HTML, ticket ID, engagement ID.</p>
+
+  <p>Le parsing de la colonne E (corps HTML) a consisté à extraire uniquement le premier bloc client via BeautifulSoup — strip des balises, suppression des signatures, des mentions légales, des fils cités (lignes commençant par &gt;) et des en-têtes d'email transféré. Lorsque la colonne D (description) était renseignée et exploitable, elle a été utilisée en priorité.</p>
+
+  <div class="callout gold">
+    <strong>Note sur les fichiers tickets :</strong> Les 45 fichiers CSV constituent un jeu de données segmenté depuis une extraction HubSpot unique. La forte proportion de doublons (73%) s'explique par la construction de l'objet HubSpot qui réplique la ligne ticket pour chaque engagement (message, note, appel) du même dossier.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- ÉTAPE 1 -->
+<!-- ============================================================ -->
+<section class="section" id="step1">
+  <div class="section-header">
+    <div class="section-tag">Étape 1</div>
+    <h1 class="section-title">Pré-classification</h1>
+  </div>
+
+  <p>Avant toute clusterisation sémantique, j'ai isolé les tickets qui ne correspondent pas à une question client documentable. Sur 35 847 tickets uniques :</p>
+
+  <table class="data-table" style="margin: 24px 0;">
+    <thead>
+      <tr>
+        <th>Catégorie</th>
+        <th>Volume</th>
+        <th>%</th>
+        <th>Pourquoi pas d'article FAQ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Tickets clients avec question identifiable</strong></td>
+        <td><strong>32 872</strong></td>
+        <td><strong>91,7 %</strong></td>
+        <td>→ Base d'analyse</td>
+      </tr>
+      <tr>
+        <td>Leads commerciaux</td>
+        <td>1 931</td>
+        <td>5,4 %</td>
+        <td>Demandes de devis / découverte produit redirigées vers Sales — pas de problème client à documenter</td>
+      </tr>
+      <tr>
+        <td>Tâches internes</td>
+        <td>1 044</td>
+        <td>2,9 %</td>
+        <td>Bilan de situation, suivi interne, notes équipe — aucune question client initiale</td>
+      </tr>
+      <tr>
+        <td>Spam / automatiques</td>
+        <td>~2 409 inclus dans clients*</td>
+        <td>—</td>
+        <td>Emails OGI-France, Simulassur, signatures assurance emprunteur — filtrés lors de la classification cluster</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:12px; color: var(--muted);">* Les tickets spam/automatiques ont une description souvent courte ; ils ont été identifiés et orientés vers le cluster SPAM_AUTO lors de la clusterisation, sans biaiser les totaux clients.</p>
+
+  <div class="callout green" style="font-size: 15px;">
+    <strong>32 872 tickets clients avec question identifiable (91,7 % du corpus) — c'est la base d'analyse.</strong>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- ÉTAPE 2 -->
+<!-- ============================================================ -->
+<section class="section" id="step2">
+  <div class="section-header">
+    <div class="section-tag">Étape 2</div>
+    <h1 class="section-title">Clusterisation sémantique</h1>
+  </div>
+
+  <p>Chaque ticket client a été classé dans un cluster unique correspondant à son intention principale. Un cluster = une intention = un article FAQ potentiel. Voici les résultats par bloc thématique.</p>
+
+  <!-- BLOC 1 -->
+  <h3>🗂 Bloc A — Démarches administratives (immatriculation, SIREN, CFE)</h3>
+  <div class="block-card">
+    <div>
+      <div class="block-name">Bloc A · Démarches administratives</div>
+      <div class="block-desc">Immatriculation, SIREN/SIRET, CFE, date début d'activité, URSSAF affiliation</div>
+    </div>
+    <div class="block-stats">
+      <div><div class="block-stat-val" style="color: var(--red);">5 207</div><div class="block-stat-label">tickets</div></div>
+      <div><div class="block-stat-val" style="color: var(--muted);">15,9 %</div><div class="block-stat-label">du corpus</div></div>
+    </div>
+  </div>
+
+  <div class="cluster-grid" style="margin-bottom: 32px;">
+    <div class="cluster-card">
+      <div class="cluster-code">C01</div>
+      <div>
+        <div class="cluster-name">Comprendre et suivre son immatriculation LMNP</div>
+        <div class="cluster-examples">
+          <div class="ticket-quote">« Pourriez-vous me renvoyer mon immatriculation pour un début d'activité au 03/01/25 ? »</div>
+          <div class="ticket-quote">« Pour l'activité du loueur meublé, je ne sais pas quoi mettre dans l'onglet Référence d'Obligation Fiscale »</div>
+          <div class="ticket-quote">« Bonjour pour suivi, j'ai fait une demande d'immatriculation pour mon bien à Bron que je souhaite mettre sous LMNP en septembre 2025 »</div>
+        </div>
+        <div style="margin-top: 8px;"><span class="badge badge-partial">Couverture partielle</span></div>
+      </div>
+      <div class="cluster-vol"><div class="vol-num">5 012</div><div class="vol-pct">15,2 %</div></div>
+    </div>
+    <div class="cluster-card">
+      <div class="cluster-code">C02</div>
+      <div>
+        <div class="cluster-name">Choisir la date de début d'activité (DDA / DEA)</div>
+        <div class="cluster-examples">
+          <div class="ticket-quote">« Bonjour, la date de début d'activité a été modifiée. Quelle date dois-je choisir exactement ? »</div>
+          <div class="ticket-quote">« Mon activité a commencé en 2024 mais j'ai fait des dépenses en 2025 »</div>
+        </div>
+        <div style="margin-top: 8px;"><span class="badge badge-ok">Article existant</span></div>
+      </div>
+      <div class="cluster-vol"><div class="vol-num">195</div><div class="vol-pct">0,6 %</div></div>
+    </div>
+  </div>
+
+  <!-- BLOC 2 -->
+  <h3>🧾 Bloc B — Cotisations sociales & OGA</h3>
+  <div class="block-card">
+    <div>
+      <div class="block-name">Bloc B · Cotisations sociales & OGA</div>
+      <div class="block-desc">URSSAF, OGA (OGI-France), cotisations sociales, affiliation, numéro adhérent</div>
+    </div>
+    <div class="block-stats">
+      <div><div class="block-stat-val" style="color: var(--red);">4 221</div><div class="block-stat-label">tickets</div></div>
+      <div><div class="block-stat-val" style="color: var(--muted);">12,8 %</div><div class="block-stat-label">du corpus</div></div>
+    </div>
+  </div>
+
+  <div class="cluster-grid" style="margin-bottom: 32px;">
+    <div class="cluster-card">
+      <div class="cluster-code">C03</div>
+      <div>
+        <div class="cluster-name">Comprendre les cotisations sociales URSSAF en LMNP</div>
+        <div class="cluster-examples">
+          <div class="ticket-quote">« De quelles cotisations sociales s'agit-il ? Comment s'affilier et à quoi ? »</div>
+          <div class="ticket-quote">« Je reçois un courrier OGI-France indiquant que je suis redevable de cotisations 2024 »</div>
+          <div class="ticket-quote">« J'ai reçu ce message de la part de OGI France concernant mon activité LMNP et le fait que je sois redevable de cotisations »</div>
+        </div>
+        <div style="margin-top: 8px;"><span class="badge badge-partial">Couverture partielle</span></div>
+      </div>
+      <div class="cluster-vol"><div class="vol-num">4 221</div><div class="vol-pct">12,8 %</div></div>
+    </div>
+  </div>
+
+  <!-- BLOC 3 -->
+  <h3>📋 Bloc C — Liasse fiscale & déclaration</h3>
+  <div class="block-card">
+    <div>
+      <div class="block-name">Bloc C · Liasse fiscale & déclaration fiscale</div>
+      <div class="block-desc">Liasse 2033/2031, télédéclaration, report IR, déclaration revenus personnelle, formulaires</div>
+    </div>
+    <div class="block-stats">
+      <div><div class="block-stat-val" style="color: var(--orange);">4 045</div><div class="block-stat-label">tickets</div></div>
+      <div><div class="block-stat-val" style="color: var(--muted);">12,3 %</div><div class="block-stat-label">du corpus</div></div>
+    </div>
+  </div>
+
+  <div class="cluster-grid" style="margin-bottom: 32px;">
+    <div class="cluster-card">
+      <div class="cluster-code">C04</div>
+      <div>
+        <div class="cluster-name">Comprendre, lire et télédéclarer sa liasse fiscale</div>
+        <div class="cluster-examples">
+          <div class="ticket-quote">« Impossible de faire la déclaration de revenus avec le doc de la liasse fiscale »</div>
+          <div class="ticket-quote">« La liasse fiscale 2023 n'a-t-elle déjà pas été télédéclarée l'année dernière ? »</div>
+        </div>
+        <div style="margin-top: 8px;"><span class="badge badge-partial">Couverture partielle</span></div>
+      </div>
+      <div class="cluster-vol"><div class="vol-num">3 759</div><div class="vol-pct">11,4 %</div></div>
+    </div>
+    <div class="cluster-card">
+      <div class="cluster-code">C05</div>
+      <div>
+        <div class="cluster-name">Reporter son résultat fiscal sur la déclaration 2042</div>
+        <div class="cluster-examples">
+          <div class="ticket-quote">« Je voulais savoir si je devais faire ma déclaration sur le site des impôts ou si vous l'aviez déjà fait »</div>
+          <div class="ticket-quote">« J'ai adhéré à OGI et lorsque je porte mon numéro d'adhérent sur ma déclaration, on m'indique que c'est une erreur »</div>
+        </div>
+        <div style="margin-top: 8px;"><span class="badge badge-partial">Couverture partielle</span></div>
+      </div>
+      <div class="cluster-vol"><div class="vol-num">286</div><div class="vol-pct">0,9 %</div></div>
+    </div>
+  </div>
+
+  <!-- BLOC 4 -->
+  <h3>💻 Bloc D — Saisie dans la plateforme Nopillo</h3>
+  <div class="block-card">
+    <div>
+      <div class="block-name">Bloc D · Utilisation de la plateforme</div>
+      <div class="block-desc">Saisie formulaire, recettes, dépenses, amortissements, emprunt, navigation, migration V2</div>
+    </div>
+    <div class="block-stats">
+      <div><div class="block-stat-val" style="color: var(--orange);">4 766</div><div class="block-stat-label">tickets</div></div>
+      <div><div class="block-stat-val" style="color: var(--muted);">14,5 %</div><div class="block-stat-label">du corpus</div></div>
+    </div>
+  </div>
+
+  <div class="cluster-grid" style="margin-bottom: 32px;">
+    <div class="cluster-card">
+      <div class="cluster-code">C06</div>
+      <div>
+        <div class="cluster-name">Aide à la saisie des données dans l'app (générale)</div>
+        <div class="cluster-examples">
+          <div class="ticket-quote">« Bonjour, on me demande d'ajouter les dépenses d'acquisition de mon logement. Ce que je ne comprends pas... »</div>
+          <div class="ticket-quote">« J'essaye d'être rappelé depuis 15 jours. Je ne vois pas où déclarer ma LMNP »</div>
+        </div>
+        <div style="margin-top: 8px;"><span class="badge badge-partial">Couverture partielle</span></div>
+      </div>
+      <div class="cluster-vol"><div class="vol-num">3 242</div><div class="vol-pct">9,9 %</div></div>
+    </div>
+    <div class="cluster-card">
+      <div class="cluster-code">C07</div>
+      <div>
+        <div class="cluster-name">Comprendre les amortissements et les renseigner</div>
+        <div class="cluster-examples">
+          <div class="ticket-quote">« Pourriez-vous me transmettre le détail de la liste des immobilisations et leur durée d'amortissement ? »</div>
+          <div class="ticket-quote">« J'ai commis une erreur dans la valeur de mon logement LMNP (frais de notaire inclus au lieu d'être exclus) »</div>
+        </div>
+        <div style="margin-top: 8px;"><span class="badge badge-partial">Couverture partielle</span></div>
+      </div>
+      <div class="cluster-vol"><div class="vol-num">603</div><div class="vol-pct">1,8 %</div></div>
+    </div>
+    <div class="cluster-card">
+      <div class="cluster-code">C08</div>
+      <div>
+        <div class="cluster-name">Se repérer après la migration vers la V2</div>
+        <div class="cluster-examples">
+          <div class="ticket-quote">« Je ne reconnais plus du tout le tableau de bord. Je suis perdu et j'ai besoin de votre aide »</div>
+          <div class="ticket-quote">« Je viens de commencer à rentrer les données... comment retrouver mes données de l'an dernier ? »</div>
+        </div>
+        <div style="margin-top: 8px;"><span class="badge badge-none">Aucun article</span></div>
+      </div>
+      <div class="cluster-vol"><div class="vol-num">359</div><div class="vol-pct">1,1 %</div></div>
+    </div>
+    <div class="cluster-card">
+      <div class="cluster-code">C09</div>
+      <div>
+        <div class="cluster-name">Saisir ses loyers et recettes locatives</div>
+        <div class="cluster-examples">
+          <div class="ticket-quote">« Je n'arrive pas à enregistrer mes loyers. J'ai un doute sur une date car je louais en BIC avant »</div>
+          <div class="ticket-quote">« Quel est le montant du loyer que je dois renseigner sachant que c'est de la location courte durée ? »</div>
+        </div>
+        <div style="margin-top: 8px;"><span class="badge badge-partial">Couverture partielle</span></div>
+      </div>
+      <div class="cluster-vol"><div class="vol-num">563</div><div class="vol-pct">1,7 %</div></div>
+    </div>
+  </div>
+
+  <!-- BLOC 5 -->
+  <h3>💰 Bloc E — Charges, dépenses & règles fiscales</h3>
+  <div class="block-card">
+    <div>
+      <div class="block-name">Bloc E · Charges, dépenses & règles fiscales</div>
+      <div class="block-desc">Déductibilité des charges, taxe foncière, travaux, copropriété, frais de notaire</div>
+    </div>
+    <div class="block-stats">
+      <div><div class="block-stat-val" style="color: var(--orange);">1 522</div><div class="block-stat-label">tickets</div></div>
+      <div><div class="block-stat-val" style="color: var(--muted);">4,6 %</div><div class="block-stat-label">du corpus</div></div>
+    </div>
+  </div>
+
+  <div class="cluster-grid" style="margin-bottom: 32px;">
+    <div class="cluster-card">
+      <div class="cluster-code">C10</div>
+      <div>
+        <div class="cluster-name">Identifier et saisir les charges déductibles</div>
+        <div class="cluster-examples">
+          <div class="ticket-quote">« Concernant la prise en compte des charges de copropriété, dois-je mettre toutes les charges sans le fond travaux ? »</div>
+          <div class="ticket-quote">« Faut-il déduire la partie ordures ménagères avant de déclarer le montant de la taxe foncière en dépense ? »</div>
+          <div class="ticket-quote">« Dois-je déduire mes impôts fonciers sur mes revenus fonciers ? »</div>
+        </div>
+        <div style="margin-top: 8px;"><span class="badge badge-partial">Couverture partielle</span></div>
+      </div>
+      <div class="cluster-vol"><div class="vol-num">1 522</div><div class="vol-pct">4,6 %</div></div>
+    </div>
+  </div>
+
+  <!-- Autres clusters -->
+  <h3>📂 Autres clusters significatifs</h3>
+
+  <table class="data-table" style="margin: 16px 0 32px;">
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Intention client</th>
+        <th>Volume</th>
+        <th>%</th>
+        <th>Article FAQ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>C11</strong></td>
+        <td>Accéder à son compte / réinitialiser son mot de passe</td>
+        <td>1 649</td>
+        <td>5,0 %</td>
+        <td><span class="badge badge-partial">Partiel</span></td>
+      </tr>
+      <tr>
+        <td><strong>C12</strong></td>
+        <td>Comprendre ou contester sa facturation Nopillo</td>
+        <td>1 431</td>
+        <td>4,4 %</td>
+        <td><span class="badge badge-none">Aucun</span></td>
+      </tr>
+      <tr>
+        <td><strong>C13</strong></td>
+        <td>Résilier son abonnement ou clôturer son activité LMNP</td>
+        <td>1 369</td>
+        <td>4,2 %</td>
+        <td><span class="badge badge-none">Aucun</span></td>
+      </tr>
+      <tr>
+        <td><strong>C14</strong></td>
+        <td>Aide à la déclaration LMNP (question générale, début de parcours)</td>
+        <td>1 492</td>
+        <td>4,5 %</td>
+        <td><span class="badge badge-ok">Couvert</span></td>
+      </tr>
+      <tr>
+        <td><strong>C16</strong></td>
+        <td>Gérer plusieurs biens en LMNP dans la plateforme</td>
+        <td>51</td>
+        <td>0,2 %</td>
+        <td><span class="badge badge-none">Aucun</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details style="margin: 0 0 32px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+    <summary style="padding: 12px 16px; cursor: pointer; background: var(--surface2); font-size: 13px; color: var(--muted); font-weight: 500; list-style: none; display: flex; align-items: center; gap: 8px;">
+      <span>🗑️</span>
+      <span>Tickets écartés de l'analyse — non documentables (7 118 tickets · 21,7 %)</span>
+      <span style="margin-left: auto; font-size: 11px;">▼ voir le détail</span>
+    </summary>
+    <div style="padding: 16px; font-size: 13px; color: var(--muted); line-height: 1.8;">
+      <table class="data-table" style="margin: 0;">
+        <thead>
+          <tr><th>Groupe</th><th>Volume</th><th>Pourquoi écarté</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Emails automatiques (OGI, assurances, partenaires)</td>
+            <td>2 409</td>
+            <td>Aucune question client — flux automatisés identifiés à la classification</td>
+          </tr>
+          <tr>
+            <td>Contact sans question / demande de rappel</td>
+            <td>3 353</td>
+            <td>Aucune intention documentable — symptôme de FAQ insuffisante, pas un sujet à couvrir</td>
+          </tr>
+          <tr>
+            <td>Résiduel multi-sujets ou contexte insuffisant</td>
+            <td>1 356</td>
+            <td>Tickets non classifiables : plusieurs sujets mêlés ou message trop court</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <div class="callout green">
+    <strong>25 754 tickets exploitables</strong> — base d'analyse retenue après exclusion des tickets non documentables (78,3 % du corpus clients).
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- ÉTAPE 3 -->
+<!-- ============================================================ -->
+<section class="section" id="step3">
+  <div class="section-header">
+    <div class="section-tag">Étape 3</div>
+    <h1 class="section-title">Analyse des métriques FAQ</h1>
+  </div>
+
+  <div class="callout red">
+    <strong>Ratio déflection : 2,05×</strong> — 26 181 vues FAQ pour 12 785 tickets sur la période sept. 2025–fév. 2026 (post-migration V2). Le benchmark sain pour un produit SaaS B2C est de 8 à 15×. On est à <strong>26 % du plancher du benchmark</strong> — il faudrait atteindre ~102 000 vues pour être dans la norme basse, soit 4× le trafic actuel.
+  </div>
+
+  <h3>Articles stars — Fort engagement, à conserver et mettre à jour</h3>
+  <table class="data-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Article</th><th>Vues</th><th>Cluster(s)</th><th>Statut</th></tr></thead>
+    <tbody>
+      <tr><td>📃 Formulaire 1447-C-SD / 1447-C-K</td><td>1 729</td><td>C01 — Immatriculation</td><td><span class="badge badge-update">À mettre à jour V2</span></td></tr>
+      <tr><td>🏠 Compléter les informations concernant votre logement</td><td>1 655</td><td>C06 — Saisie app</td><td><span class="badge badge-update">À mettre à jour V2</span></td></tr>
+      <tr><td>🧾 SIREN : compléter les informations administratives</td><td>1 212</td><td>C01 — Immatriculation</td><td><span class="badge badge-update">À mettre à jour V2</span></td></tr>
+      <tr><td>🧾 Qu'est-ce que la CFE ?</td><td>1 073</td><td>C01 — Immatriculation</td><td><span class="badge badge-star">⭐ Star</span></td></tr>
+      <tr><td>Comment créer mon compte professionnel sur Impot.gouv.fr ?</td><td>971</td><td>C04 — Liasse</td><td><span class="badge badge-star">⭐ Star</span></td></tr>
+      <tr><td>📝 Formulaire 751-SD (versions A, B, C)</td><td>2 312 cumulés</td><td>C01 — Immatriculation</td><td><span class="badge badge-update">À consolider + MAJ</span></td></tr>
+      <tr><td>💡 Tout savoir sur l'immatriculation en LMNP</td><td>896</td><td>C01 — Immatriculation</td><td><span class="badge badge-update">À mettre à jour V2</span></td></tr>
+      <tr><td>🛒 Comment compléter vos dépenses ?</td><td>879</td><td>C10 — Charges</td><td><span class="badge badge-update">À mettre à jour V2</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Articles invisibles — Faibles vues malgré fort volume tickets</h3>
+  <div class="callout blue">Ces articles traitent de sujets très demandés mais ne sont pas trouvés par les clients. Problème de <strong>findabilité</strong> (titre, catégorie, mots-clés, liens internes), pas de contenu.</div>
+  <table class="data-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Article</th><th>Vues</th><th>Cluster correspondant</th><th>Volume tickets</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>⌨️ Comment accéder à mon compte Nopillo ?</td><td>22</td><td>C11 — Accès compte</td><td>1 649</td>
+        <td><span class="badge badge-invisible">Renommer + déplacer</span></td>
+      </tr>
+      <tr>
+        <td>🔑 Mot de passe oublié / réinitialisation</td><td>14</td><td>C11 — Accès compte</td><td>1 649</td>
+        <td><span class="badge badge-invisible">Fusionner + mettre en avant</span></td>
+      </tr>
+      <tr>
+        <td>🧾 Comment trouver ma facture Nopillo ?</td><td>73</td><td>C12 — Facturation</td><td>1 431</td>
+        <td><span class="badge badge-invisible">Enrichir + repositionner</span></td>
+      </tr>
+      <tr>
+        <td>📃 Comment lire ma liasse fiscale ?</td><td>334</td><td>C04 — Liasse</td><td>3 759</td>
+        <td><span class="badge badge-invisible">Lier depuis app + renommer</span></td>
+      </tr>
+      <tr>
+        <td>📋 Comment reporter son résultat fiscal sur la 2042 ?</td><td>381</td><td>C05 — Décl. IR</td><td>286</td>
+        <td><span class="badge badge-update">Mettre en avant à la saison</span></td>
+      </tr>
+      <tr>
+        <td>🏛️ Suis-je assujetti à l'URSSAF ?</td><td>0</td><td>C03 — Cotisations</td><td>4 221</td>
+        <td><span class="badge badge-invisible">0 vue ! Vérifier statut publié</span></td>
+      </tr>
+      <tr>
+        <td>📝 Comment remplir la déclaration 2042-C-PRO ?</td><td>1</td><td>C05 — Décl. IR</td><td>286</td>
+        <td><span class="badge badge-invisible">Quasi inexistant — enrichir</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Articles fantômes — Faibles vues ET faible demande tickets</h3>
+  <table class="data-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Article</th><th>Vues</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td>🆘 Alertes : Frais de courtage</td><td>6</td><td><span class="badge badge-archive">Archiver ou fusionner</span></td></tr>
+      <tr><td>🆘 Alerte : Frais de gestion locative</td><td>5</td><td><span class="badge badge-archive">Archiver ou fusionner</span></td></tr>
+      <tr><td>🆘 Alerte : Assurance PNO</td><td>2</td><td><span class="badge badge-archive">Archiver ou fusionner</span></td></tr>
+      <tr><td>🆘 Alerte : Assurance loyer impayé</td><td>1</td><td><span class="badge badge-archive">Archiver ou fusionner</span></td></tr>
+      <tr><td>❓ L'activité est manquante</td><td>0</td><td><span class="badge badge-archive">Vérifier / archiver</span></td></tr>
+      <tr><td>🌍 Non-résident fiscal (×2 articles)</td><td>26 + 24 = 50</td><td><span class="badge badge-archive">Fusionner en 1 article</span></td></tr>
+      <tr><td>🕹️ Réaliser une simulation d'impôts</td><td>38</td><td><span class="badge badge-archive">Faible valeur documentaire</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Doublons identifiés</h3>
+  <table class="data-table" style="margin-bottom: 24px;">
+    <thead><tr><th>Doublon 1</th><th>Doublon 2</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td>Formulaire 751-SD – Version A (857 vues)</td><td>Formulaire 751-SD – Version B (558) + Version C (897)</td><td>Consolider en 1 article avec onglets</td></tr>
+      <tr><td>💻 Guide ultime de la déclaration LMNP/LMP (723)</td><td>📝 Déclaration LMNP/LMP – le guide ultime (225)</td><td>Fusionner, garder le plus vu</td></tr>
+      <tr><td>🌟 Tout savoir sur la date de mise en location (221)</td><td>🌟 Tout savoir sur la date de mise en location (24)</td><td>Article dupliqué exact — supprimer le doublon</td></tr>
+      <tr><td>Quelle date pour l'immatriculation ? (884 vues)</td><td>Quelle date pour l'immatriculation ? – autre version (209 vues)</td><td>Fusionner</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- ÉTAPE 4 -->
+<!-- ============================================================ -->
+<section class="section" id="step4">
+  <div class="section-header">
+    <div class="section-tag">Étape 4</div>
+    <h1 class="section-title">Diagnostic</h1>
+  </div>
+
+  <h3>1. La FAQ est-elle sous-utilisée ?</h3>
+  <div class="callout red">
+    <strong>Oui, significativement.</strong> Avec un ratio déflection de <strong>2,05×</strong> (benchmark : 8–15×), la FAQ est à seulement 26 % du plancher minimal attendu. En termes absolus : 26 181 vues FAQ pour 12 785 tickets sur la période sept. 2025–fév. 2026 (post-migration V2). Pour atteindre le seuil bas du benchmark (8×), il faudrait générer ~102 000 vues — soit 4× le trafic actuel. Les 37 articles avec moins de 50 vues (dont 2 à zéro) sur la période confirment qu'une large partie du catalogue reste introuvable pour les clients.
+  </div>
+
+  <h3>2. L'architecture est-elle adaptée aux intentions client ?</h3>
+  <div class="callout orange">
+    <strong>Non.</strong> L'architecture actuelle est organisée selon une logique <em>produit</em> (Utiliser l'application / Nouvelle plateforme de saisie / Impôts et formulaires / OGA…). Les clients, eux, arrivent avec des intentions de type <em>parcours</em> : "je veux m'immatriculer", "je reçois un courrier des impôts", "ma liasse est rejetée". La catégorie "Nouvelle plateforme de saisie Nopillo" (16 articles) illustre parfaitement ce décalage : elle est organisée autour de la mise en production V2, pas autour de ce que cherche le client.
+  </div>
+
+  <p><strong>Comparaison architecture actuelle vs intentions réelles :</strong></p>
+  <table class="data-table" style="margin-bottom: 24px;">
+    <thead><tr><th>Catégorie actuelle</th><th>Articles</th><th>Intention client correspondante</th><th>Cohérence</th></tr></thead>
+    <tbody>
+      <tr><td>Utiliser l'application Nopillo</td><td>29</td><td>Saisie + navigation (C06, C07, C09)</td><td>⚠ Trop large, mélange V1/V2</td></tr>
+      <tr><td>Nouvelle plateforme de saisie Nopillo</td><td>16</td><td>Migration V2 (C08)</td><td>❌ Logique interne, pas client</td></tr>
+      <tr><td>Impôts et formulaires</td><td>21</td><td>Liasse + décl. IR (C04, C05)</td><td>✅ Cohérent</td></tr>
+      <tr><td>Immatriculation et démarches</td><td>7</td><td>C01 — 5 012 tickets</td><td>❌ Sous-dimensionné pour le 1er cluster</td></tr>
+      <tr><td>OGA</td><td>4</td><td>C03 — 4 221 tickets</td><td>❌ Trop peu d'articles pour le 2e cluster</td></tr>
+      <tr><td>Questions fréquentes</td><td>10</td><td>Divers</td><td>⚠ Fourre-tout non actionnable</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3. Quels articles sont obsolètes ?</h3>
+  <p>La migration V2 (septembre 2025) a rendu potentiellement obsolètes tous les articles avec captures d'écran ou tutoriels pas-à-pas basés sur l'ancienne interface. Les articles les plus urgents à mettre à jour sont ceux avec le plus de trafic (car leur contenu erroné est vu le plus souvent) :</p>
+  <table class="data-table" style="margin-bottom: 24px;">
+    <thead><tr><th>Article</th><th>Vues</th><th>Urgence</th></tr></thead>
+    <tbody>
+      <tr><td>Formulaire 1447-C-SD / 1447-C-K</td><td>1 729</td><td><span class="badge badge-p1">🔴 Urgent</span></td></tr>
+      <tr><td>Compléter les informations concernant votre logement</td><td>1 655</td><td><span class="badge badge-p1">🔴 Urgent</span></td></tr>
+      <tr><td>SIREN : informations administratives</td><td>1 212</td><td><span class="badge badge-p1">🔴 Urgent</span></td></tr>
+      <tr><td>Formulaire 751-SD (3 versions)</td><td>2 312 cumulés</td><td><span class="badge badge-p1">🔴 Urgent</span></td></tr>
+      <tr><td>Guide ultime de la déclaration LMNP/LMP</td><td>723 + 225</td><td><span class="badge badge-p2">🟠 Prioritaire</span></td></tr>
+      <tr><td>Étapes 1–4 (ancienne arborescence)</td><td>1 694 cumulés</td><td><span class="badge badge-p1">🔴 Urgent — basés sur V1</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>4. Quels sont les gaps critiques ?</h3>
+  <p>Sujets avec fort volume de tickets et <strong>aucun article FAQ dédié</strong>, classés par volume décroissant :</p>
+  <table class="data-table">
+    <thead><tr><th>Sujet manquant</th><th>Cluster(s)</th><th>Volume tickets</th><th>Priorité</th></tr></thead>
+    <tbody>
+      <tr><td>Résiliation / clôture d'activité LMNP</td><td>C13</td><td>1 369</td><td><span class="badge badge-p1">P1</span></td></tr>
+      <tr><td>Comprendre et gérer sa facturation Nopillo</td><td>C12</td><td>1 431</td><td><span class="badge badge-p1">P1</span></td></tr>
+      <tr><td>Se repérer dans la nouvelle interface V2</td><td>C08</td><td>359</td><td><span class="badge badge-p1">P1</span></td></tr>
+      <tr><td>Gérer plusieurs biens dans l'app</td><td>C16</td><td>51</td><td><span class="badge badge-p2">P2</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- ÉTAPE 5 -->
+<!-- ============================================================ -->
+<section class="section" id="step5">
+  <div class="section-header">
+    <div class="section-tag">Étape 5</div>
+    <h1 class="section-title">Recommandations</h1>
+  </div>
+
+  <!-- 5.1 P1 -->
+  <h3>5.1 — Articles à créer · Priorité P1</h3>
+
+  <div class="rec-card">
+    <div class="rec-header">
+      <span class="badge badge-p1">🆕 P1</span>
+      <div>
+        <div class="rec-title">Résilier mon abonnement ou clôturer mon activité LMNP</div>
+        <div class="rec-meta">Cluster C13 · 1 369 tickets · Aucun article existant</div>
+      </div>
+    </div>
+    <p>1 369 tickets sur la résiliation, soit 4,2 % du corpus — pour un sujet qui devrait être entièrement auto-service. Chaque ticket résiliation mobilise un CCM pour une procédure standardisable.</p>
+    <ul class="plan-list">
+      <li>Comment résilier son abonnement Nopillo (démarche pas-à-pas)</li>
+      <li>Quelle est la date d'effet de la résiliation ? (prorata, cycle de facturation)</li>
+      <li>Mes données sont-elles conservées après résiliation ?</li>
+      <li>Comment clôturer officiellement son activité LMNP auprès du greffe / INPI ?</li>
+      <li>Que se passe-t-il pour les liasses des années antérieures ?</li>
+      <li>Peut-on réactiver son compte après résiliation ?</li>
+      <li>Contact si situation particulière (résiliation en cours d'exercice)</li>
+    </ul>
+    <div>
+      <div class="ticket-quote">« Je ne souhaite pas renouveler vos services. Cordialement. »</div>
+      <div class="ticket-quote">« Je souhaite mettre fin à mon LMNP, et donc résilier mon contrat et clôturer mon statut LMNP. J'aimerais savoir la marche à suivre, est-ce que c'est vous qui vous occupez de la clôture ? »</div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-header">
+      <span class="badge badge-p1">🆕 P1</span>
+      <div>
+        <div class="rec-title">Comprendre ma facture Nopillo et gérer mon abonnement</div>
+        <div class="rec-meta">Cluster C12 · 1 431 tickets · Article partiel insuffisant</div>
+      </div>
+    </div>
+    <p>1 431 tickets sur la facturation. L'article existant « Comment trouver ma facture ? » ne répond qu'à une fraction des questions. Les clients contactent le support pour des litiges de montant, des prélevèments non reconnus, ou des questions sur le renouvellement automatique.</p>
+    <ul class="plan-list">
+      <li>Où trouver mes factures Nopillo ?</li>
+      <li>Comment est calculé le montant de mon abonnement ?</li>
+      <li>Mon abonnement se renouvelle-t-il automatiquement ?</li>
+      <li>Comment modifier mes informations de paiement ?</li>
+      <li>J'ai été prélevé d'un montant différent de ce qui était prévu — que faire ?</li>
+      <li>Puis-je payer en plusieurs fois ?</li>
+      <li>L'abonnement Nopillo est-il déductible de mes charges LMNP ?</li>
+    </ul>
+    <div>
+      <div class="ticket-quote">« Je souhaite être rappelé concernant le montant qui m'a été facturé de 599€ au lieu de 499€ qui avait été négocié »</div>
+      <div class="ticket-quote">« Comment faire pour annuler le prélèvement du 1er juillet ? Je ne souhaite pas le renouveler car j'ai arrêté les locations 2025 »</div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-header">
+      <span class="badge badge-p1">🆕 P1</span>
+      <div>
+        <div class="rec-title">Découvrir la nouvelle interface Nopillo V2 — Guide de prise en main</div>
+        <div class="rec-meta">Cluster C08 · 359 tickets · Aucun article existant · Migration sept. 2025</div>
+      </div>
+    </div>
+    <p>Depuis la mise en production V2 en septembre 2025, les clients qui avaient l'habitude de la V1 se retrouvent désorientés. Absence totale de guide de transition dans la FAQ.</p>
+    <ul class="plan-list">
+      <li>Qu'est-ce qui a changé entre la V1 et la V2 de Nopillo ?</li>
+      <li>Où retrouver mes données de l'année précédente ?</li>
+      <li>Comment naviguer dans le nouveau tableau de bord ?</li>
+      <li>La procédure de déclaration a-t-elle changé ?</li>
+      <li>Vidéo de prise en main de la V2 (à intégrer)</li>
+      <li>FAQ spécifique aux questions de migration</li>
+    </ul>
+    <div>
+      <div class="ticket-quote">« Je ne reconnais plus du tout le tableau de bord du site web sur lequel j'avais déjà rempli 90% des infos. Je suis perdu et j'ai besoin de votre aide »</div>
+      <div class="ticket-quote">« Bonjour, depuis votre téléphone et mon inscription et mon paiement, je n'ai plus de nouvelles de vous et je ne sais pas comment je dois faire pour faire ma déclaration »</div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-header">
+      <span class="badge badge-p1">🆕 P1</span>
+      <div>
+        <div class="rec-title">Comprendre mes cotisations sociales et les courriers OGI-France / URSSAF</div>
+        <div class="rec-meta">Cluster C03 · 4 221 tickets · Couverture très partielle</div>
+      </div>
+    </div>
+    <p>4 221 tickets — 2e cluster en volume. Les clients reçoivent des courriers d'OGI-France ou de l'URSSAF et ne comprennent pas ce qu'ils doivent faire. L'article existant sur l'affiliation URSSAF (498 vues) ne couvre pas la réception d'un courrier en cours d'exercice ni les montants réclamés.</p>
+    <ul class="plan-list">
+      <li>Je reçois un courrier OGI-France : dois-je y répondre ? Que faire ?</li>
+      <li>Quand est-ce que je deviens redevable de cotisations sociales en LMNP ?</li>
+      <li>Comment calculer le montant de mes cotisations URSSAF ?</li>
+      <li>Différence entre OGA (réduction d'impôt) et URSSAF (cotisations sociales)</li>
+      <li>Délais et procédure d'affiliation URSSAF étape par étape</li>
+      <li>Que se passe-t-il si je ne m'affilie pas ?</li>
+    </ul>
+    <div>
+      <div class="ticket-quote">« De quelles cotisations sociales s'agit-il ? Comment s'affilier et à quoi ? Comment faire ? Pouvez-vous me guider svp ? »</div>
+      <div class="ticket-quote">« J'ai reçu un message de la part de OGI France concernant mon activité LMNP et le fait que je sois redevable de cotisations sur l'année 2024 »</div>
+    </div>
+  </div>
+
+  <!-- 5.2 P2 -->
+  <h3>5.2 — Articles à créer · Priorité P2</h3>
+  <table class="data-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Titre recommandé</th><th>Cluster</th><th>Tickets</th><th>Contenu clé</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Gérer plusieurs biens LMNP dans Nopillo</td><td>C16</td><td>51</td>
+        <td>Ajouter un 2e bien, SIRET unique vs multiple, déclarations séparées</td>
+      </tr>
+      <tr>
+        <td>Déclarer mes loyers Airbnb et Booking en LMNP</td><td>C09</td><td>563</td>
+        <td>Montant brut vs net, revenus saisonniers, prorata, classement meublé de tourisme</td>
+      </tr>
+      <tr>
+        <td>Revenir sur une déclaration d'une année antérieure</td><td>C04</td><td>~200</td>
+        <td>Exercice de rattrapage, délais, procédure dans l'app, impact fiscal</td>
+      </tr>
+      <tr>
+        <td>Comprendre mon déficit LMNP et comment l'utiliser</td><td>C04/C10</td><td>~150</td>
+        <td>Définition, report déficit, différence LMNP/LMP, impact sur IR</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 5.3 Articles invisibles -->
+  <h3>5.3 — Articles à rendre plus visibles</h3>
+  <table class="data-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Article</th><th>Vues actuelles</th><th>Action concrète</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>⌨️ Comment accéder à mon compte Nopillo ? + 🔑 Mot de passe oublié</td><td>22 + 14</td>
+        <td>Fusionner en 1 article "Connexion et accès à mon compte" · Catégorie "Prise en main" · Lien depuis la page de login HubSpot</td>
+      </tr>
+      <tr>
+        <td>🏛️ Suis-je assujetti à l'URSSAF ? (0 vue)</td><td>0</td>
+        <td>Vérifier que l'article est bien publié · Changer le titre vers une question client : "Je reçois un courrier URSSAF, que faire ?"</td>
+      </tr>
+      <tr>
+        <td>📃 Comment lire ma liasse fiscale ?</td><td>334</td>
+        <td>Lier depuis l'email d'envoi de la liasse · Ajouter dans l'app au moment de la validation de déclaration</td>
+      </tr>
+      <tr>
+        <td>📝 Comment remplir la 2042-C-PRO ? (1 vue)</td><td>1</td>
+        <td>Renommer : "Reporter mon résultat Nopillo sur ma déclaration de revenus (impôts.gouv)" · Catégorie "Déclaration" · Pin en saison fiscale</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 5.4 Articles à archiver -->
+  <h3>5.4 — Articles à archiver ou fusionner</h3>
+  <table class="data-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Article</th><th>Vues</th><th>Action</th><th>Justification</th></tr></thead>
+    <tbody>
+      <tr><td>🆘 Alerte : Assurance loyer impayé</td><td>1</td><td><span class="badge badge-archive">Archiver</span></td><td>Quasi invisible, alerte in-app suffisante</td></tr>
+      <tr><td>🆘 Alerte : Assurance PNO</td><td>2</td><td><span class="badge badge-archive">Archiver</span></td><td>Même logique</td></tr>
+      <tr><td>🆘 Alerte : Frais de courtage / Frais de gestion</td><td>6 / 5</td><td><span class="badge badge-archive">Fusionner en 1 article "Alertes charges"</span></td><td>Trop granulaires — regrouper les 9 alertes en 1 article</td></tr>
+      <tr><td>🌍 Non-résident (×2 articles)</td><td>50 cumulés</td><td><span class="badge badge-archive">Fusionner en 1</span></td><td>Doublon exact de contenu</td></tr>
+      <tr><td>🌟 Tout savoir sur la date de mise en location (doublon)</td><td>24</td><td><span class="badge badge-archive">Supprimer</span></td><td>Copie exacte d'un article à 221 vues</td></tr>
+      <tr><td>📝 Déclaration LMNP/LMP – le guide ultime (doublon)</td><td>225</td><td><span class="badge badge-archive">Fusionner avec la version à 723 vues</span></td><td>Même contenu, version moins vue</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 5.5 À mettre à jour -->
+  <h3>5.5 — Articles à mettre à jour</h3>
+  <table class="data-table">
+    <thead><tr><th>Article</th><th>Vues</th><th>Urgence</th><th>Nature de la mise à jour</th></tr></thead>
+    <tbody>
+      <tr><td>📃 Formulaire 1447-C-SD / 1447-C-K</td><td>1 729</td><td><span class="badge badge-p1">🔴 Urgent</span></td><td>Captures V2, procédure mise à jour post-migration</td></tr>
+      <tr><td>🏠 Compléter les informations logement</td><td>1 655</td><td><span class="badge badge-p1">🔴 Urgent</span></td><td>Interface V2, nouveau flux de saisie</td></tr>
+      <tr><td>🧾 SIREN : informations administratives</td><td>1 212</td><td><span class="badge badge-p1">🔴 Urgent</span></td><td>Captures + parcours V2</td></tr>
+      <tr><td>📝 Formulaire 751-SD (A + B + C)</td><td>2 312</td><td><span class="badge badge-p1">🔴 Urgent</span></td><td>Consolider en 1 article avec onglets, captures V2</td></tr>
+      <tr><td>🛒 Comment compléter vos dépenses ?</td><td>879</td><td><span class="badge badge-p1">🔴 Urgent</span></td><td>Nouveau module dépenses V2</td></tr>
+      <tr><td>💻 Guide ultime de la déclaration LMNP/LMP</td><td>723</td><td><span class="badge badge-p2">🟠 Prioritaire</span></td><td>Fusion avec doublon, remise à jour V2</td></tr>
+      <tr><td>1️⃣ Étape 1 à 4️⃣ Étape 4 (parcours ancienne version)</td><td>1 694 cumulés</td><td><span class="badge badge-p1">🔴 Urgent</span></td><td>Reconstruire sur le nouveau parcours V2</td></tr>
+      <tr><td>Je dois m'affilier à l'URSSAF, comment faire ?</td><td>498</td><td><span class="badge badge-p2">🟠 Prioritaire</span></td><td>Enrichir avec la gestion des courriers OGI reçus</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- ÉTAPE 6 -->
+<!-- ============================================================ -->
+<section class="section" id="step6">
+  <div class="section-header">
+    <div class="section-tag">Étape 6</div>
+    <h1 class="section-title">Nouvelle architecture proposée</h1>
+  </div>
+
+  <p>L'architecture proposée suit le <strong>parcours client réel</strong> : de la découverte et de l'inscription jusqu'à la déclaration validée, en passant par la vie courante de l'abonnement. Exit la logique produit interne — chaque catégorie répond à la question "à quel moment de mon parcours suis-je ?"</p>
+
+  <div class="arch-grid">
+    <div class="arch-card">
+      <div class="arch-emoji">🚀</div>
+      <div class="arch-name">1. Démarrer avec Nopillo</div>
+      <div class="arch-logic">Onboarding, première connexion, navigation V2, comprendre le produit. Répond aux 359 tickets migration V2 et aux 2 680 tickets "contact général sans question".</div>
+      <div class="arch-count"><span>8 articles</span> (3 à migrer · 2 à créer · 3 à mettre à jour)</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-emoji">🏛️</div>
+      <div class="arch-name">2. M'immatriculer en LMNP</div>
+      <div class="arch-logic">Toutes les démarches administratives : SIREN/SIRET, date début d'activité, formulaires greffe/INPI, CFE, premier exercice. Le cluster C01 représente à lui seul 15,2 % du corpus.</div>
+      <div class="arch-count"><span>12 articles</span> (7 à migrer · 2 à créer · 3 à mettre à jour)</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-emoji">💻</div>
+      <div class="arch-name">3. Saisir ma comptabilité</div>
+      <div class="arch-logic">Recettes, dépenses, amortissements, emprunt, multi-biens. Répond aux clusters C06, C07, C09, C10, C16 soit ~5 980 tickets cumulés.</div>
+      <div class="arch-count"><span>14 articles</span> (9 à migrer · 3 à créer · 2 à mettre à jour)</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-emoji">📋</div>
+      <div class="arch-name">4. Valider et déposer ma déclaration</div>
+      <div class="arch-logic">Liasse fiscale, validation, télédéclaration, report IR, 2042-C-PRO, calendrier fiscal, délais. Répond aux clusters C04 et C05 (4 045 tickets).</div>
+      <div class="arch-count"><span>10 articles</span> (7 à migrer · 2 à créer · 1 à mettre à jour)</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-emoji">🧾</div>
+      <div class="arch-name">5. OGA, URSSAF & cotisations sociales</div>
+      <div class="arch-logic">Dédiée au cluster C03 (4 221 tickets) — OGA, OGI-France, URSSAF, cotisations, seuils, affiliation. Actuellement dispersée dans 4 catégories différentes.</div>
+      <div class="arch-count"><span>8 articles</span> (4 à migrer · 2 à créer · 2 à mettre à jour)</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-emoji">📜</div>
+      <div class="arch-name">6. Règles fiscales & statuts</div>
+      <div class="arch-logic">Comprendre le régime BIC réel simplifié, LMNP/LMP, déficit, amortissements théoriques, Loi Le Meur / LF 2025, location nue vs meublée. Articles de fond.</div>
+      <div class="arch-count"><span>10 articles</span> (8 à migrer · 2 à créer)</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-emoji">💳</div>
+      <div class="arch-name">7. Mon abonnement & facturation</div>
+      <div class="arch-logic">Répond aux 1 431 tickets facturation (C12) et 1 369 résiliation (C13) — deux clusters sans article dédié. Tarifs, renouvellement, résiliation, remboursement.</div>
+      <div class="arch-count"><span>6 articles</span> (2 à migrer · 2 à créer · 2 à mettre à jour)</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-emoji">🛠️</div>
+      <div class="arch-name">8. Problèmes & dépannage</div>
+      <div class="arch-logic">Accès compte, bug, liasse rejetée, erreurs de saisie, connexion. Fusionne la catégorie "Problèmes techniques" actuelle avec les articles d'alertes et de gestion d'erreur.</div>
+      <div class="arch-count"><span>8 articles</span> (5 à migrer · 1 à créer · 2 à mettre à jour)</div>
+    </div>
+  </div>
+
+  <div class="callout green" style="margin-top: 24px;">
+    <strong>Résumé :</strong> 8 catégories · ~76 articles au total (contre 110 actuels — gain de 34 articles par fusion/archivage) · Couverture étendue sur les gaps P1 et P2 · Chaque catégorie est nommée à la première personne du client.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- ÉTAPE 7 -->
+<!-- ============================================================ -->
+<section class="section" id="step7">
+  <div class="section-header">
+    <div class="section-tag">Étape 7</div>
+    <h1 class="section-title">Rapport de vérification finale</h1>
+  </div>
+
+  <table class="verif-table" style="background: var(--surface); border-radius: 10px; overflow: hidden; border: 1px solid var(--border);">
+    <tbody>
+      <tr><td>Total tickets fichier source (lignes brutes)</td><td>132 230</td></tr>
+      <tr><td>Doublons inter-fichiers écartés (même ID ticket)</td><td>96 383</td></tr>
+      <tr><td>Tickets sur la période de mesure FAQ (sept. 2025 – fév. 2026)</td><td><strong>12 785</strong></td></tr>
+      <tr><td>Total tickets corpus complet analysé (janv. 2025 – fév. 2026)</td><td>35 847</td></tr>
+      <tr><td>Tickets pré-classifiés non-clients (leads + internes)</td><td>2 975 (8,3 %)</td></tr>
+      <tr><td>Tickets spam/automatiques (SPAM_AUTO)</td><td>2 409 (6,7 %)</td></tr>
+      <tr><td>Tickets clients avec question identifiable</td><td><strong>32 872 (91,7 %)</strong></td></tr>
+      <tr><td>Clusters créés</td><td>18 (+ 1 SPAM_AUTO)</td></tr>
+      <tr><td>Cluster résiduel C99</td><td>1 356 (4,1 %) — tickets multi-sujets ou contexte insuffisant</td></tr>
+      <tr><td>Cluster "Rappel / Contact général sans question"</td><td>3 353 (10,2 %) — signal FAQ insuffisante</td></tr>
+      <tr><td>Tickets inventés</td><td style="color: var(--green);"><strong>0</strong></td></tr>
+      <tr><td>Articles FAQ analysés</td><td>110</td></tr>
+      <tr><td>Total vues FAQ sur la période</td><td>26 181</td></tr>
+      <tr><td>Ratio déflection FAQ / ticket</td><td style="color: var(--orange);"><strong>2,05× (benchmark sain : 8–15× — à 26% du plancher)</strong></td></tr>
+      <tr><td>Articles à créer P1</td><td>4</td></tr>
+      <tr><td>Articles à créer P2</td><td>4</td></tr>
+      <tr><td>Articles à mettre à jour (urgent)</td><td>8</td></tr>
+      <tr><td>Articles à archiver ou fusionner</td><td>12–15</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- ANNEXE -->
+<!-- ============================================================ -->
+<section class="section" id="annexe">
+  <div class="section-header">
+    <div class="section-tag">Annexe</div>
+    <h1 class="section-title">Nouvelle FAQ — Structure article par article</h1>
+    <p class="section-desc">Marqueurs : <span class="tag-p1">🆕 P1</span> = à créer priorité 1 · <span class="tag-p2">🆕 P2</span> = à créer priorité 2 · <span class="tag-maj">✅ MAJ</span> = existant à mettre à jour · sans marquage = à migrer dans la nouvelle catégorie</p>
+  </div>
+
+  <!-- CAT 1 -->
+  <h3>🚀 1. Démarrer avec Nopillo</h3>
+  <table class="annexe-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Marqueur</th><th>Titre de l'article</th><th>Points clés à couvrir</th></tr></thead>
+    <tbody>
+      <tr><td class="tag-p1">🆕 P1</td><td>Découvrir la nouvelle interface Nopillo V2 — Guide de prise en main</td><td>Ce qui a changé depuis la V1 · Retrouver ses données · Navigation nouveau tableau de bord · Vidéo démo</td></tr>
+      <tr><td class="tag-maj">✅ MAJ</td><td>💻 Le guide ultime de la déclaration LMNP / LMP</td><td>Mettre à jour le parcours V2 · Fusionner avec le doublon · Screenshots actualisés</td></tr>
+      <tr><td class="tag-maj">✅ MAJ</td><td>1️⃣ Étape 1 : création de mon espace personnel et de mon logement</td><td>Reconstruire sur le nouveau parcours V2 · Supprimer les captures V1</td></tr>
+      <tr><td class="tag-maj">✅ MAJ</td><td>2️⃣ à 4️⃣ Étapes 2–4 (parcours déclaration)</td><td>Idem — reconstruire sur V2 · Ou remplacer par 1 guide unique en plusieurs sections</td></tr>
+      <tr><td></td><td>🎥 Je visionne le replay de webinar d'onboarding</td><td>Migrer · Vérifier que le replay V2 est disponible et remplace bien le V1</td></tr>
+      <tr><td></td><td>📙 Lexique comptable / Nopillo simplifié</td><td>Migrer tel quel</td></tr>
+      <tr><td class="tag-p2">🆕 P2</td><td>Comment contacter le support Nopillo selon ma situation</td><td>Quand écrire vs appeler · Délais de réponse · Canaux disponibles · Réduction des 3 353 tickets "contact sans question"</td></tr>
+    </tbody>
+  </table>
+
+  <!-- CAT 2 -->
+  <h3>🏛️ 2. M'immatriculer en LMNP</h3>
+  <table class="annexe-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Marqueur</th><th>Titre de l'article</th><th>Points clés à couvrir</th></tr></thead>
+    <tbody>
+      <tr><td class="tag-maj">✅ MAJ</td><td>💡 Tout savoir sur l'immatriculation en LMNP</td><td>Procédure mise à jour · Délais actuels · Nouveau formulaire INPI · Captures V2</td></tr>
+      <tr><td class="tag-maj">✅ MAJ</td><td>📃 Formulaire 1447-C-SD / 1447-C-K</td><td>Captures V2 · Procédure mise à jour · Liens vers impots.gouv</td></tr>
+      <tr><td class="tag-maj">✅ MAJ</td><td>📝 Formulaire 751-SD (versions A + B + C)</td><td>Consolider en 1 article avec onglets · Expliquer quand utiliser quelle version · Captures V2</td></tr>
+      <tr><td class="tag-maj">✅ MAJ</td><td>🧾 SIREN : compléter les informations administratives</td><td>Captures V2 · Nouveau parcours de saisie</td></tr>
+      <tr><td></td><td>Quelle date choisir pour l'immatriculation en LMNP (DDA) ? Et pour les logements suivants (DEA) ?</td><td>Migrer · Fusionner le doublon · Clarifier cas particuliers (rétroactivité, premier bien vs suivants)</td></tr>
+      <tr><td></td><td>🧾 Qu'est-ce que la CFE (cotisation foncière des entreprises) ?</td><td>Migrer · Vérifier la précision post-LF 2025</td></tr>
+      <tr><td></td><td>💾 Comment télécharger mon avis de CFE sur impots.gouv ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>🚨 Qu'est-ce que mon numéro SIREN ? mon numéro SIRET ? Où les trouver ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>🪜 Les démarches du LMNP au régime réel simplifié</td><td>Migrer · Article de synthèse du parcours administratif</td></tr>
+      <tr><td></td><td>🗓️ À quoi correspond la date de début d'activité ? Où puis-je la trouver ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>🔄 Comment passer du micro-BIC au réel simplifié ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>Comment créer mon compte professionnel sur Impot.gouv.fr ?</td><td>Migrer · MAJ si interface impots.gouv a changé</td></tr>
+    </tbody>
+  </table>
+
+  <!-- CAT 3 -->
+  <h3>💻 3. Saisir ma comptabilité</h3>
+  <table class="annexe-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Marqueur</th><th>Titre de l'article</th><th>Points clés à couvrir</th></tr></thead>
+    <tbody>
+      <tr><td class="tag-maj">✅ MAJ</td><td>🏠 Compléter les informations concernant votre logement</td><td>Captures V2 · Nouveau formulaire logement · Valeur bien, meubles, surface</td></tr>
+      <tr><td class="tag-maj">✅ MAJ</td><td>🛒 Comment compléter vos dépenses ?</td><td>Nouveau module dépenses V2 · Catégorisation · Pièces jointes</td></tr>
+      <tr><td class="tag-maj">✅ MAJ</td><td>💶 Comment compléter vos recettes dans Nopillo ?</td><td>Captures V2 · Location courte durée (Airbnb, Booking) · Charges locataires</td></tr>
+      <tr><td class="tag-p2">🆕 P2</td><td>Déclarer mes loyers Airbnb et Booking en LMNP — Montant brut ou net ?</td><td>Définir brut vs net · Charges déduites par les plateformes · Impact sur la déclaration · Classement meublé de tourisme</td></tr>
+      <tr><td></td><td>🏦 Comment renseigner un emprunt ?</td><td>Migrer · MAJ captures V2</td></tr>
+      <tr><td></td><td>🏘️ À quoi correspond la valeur du logement déclaré ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>🪑 À quoi correspond la valeur des meubles ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>🏠 Comment est calculé l'amortissement ?</td><td>Migrer · Enrichir avec la procédure de modification en cas d'erreur</td></tr>
+      <tr><td></td><td>🍰 Quelles dépenses faut-il proratiser dans l'app ?</td><td>Migrer · Vérifier cohérence V2</td></tr>
+      <tr><td></td><td>🏗️ Travaux : quelle catégorie choisir ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>💰 Quelles sont les charges et amortissements déductibles au réel simplifié ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>⚖️ Comment votre logement est-il utilisé ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>📑 Quels documents/PJ ajouter sur mon espace Nopillo ?</td><td>Migrer · MAJ V2</td></tr>
+      <tr><td class="tag-p2">🆕 P2</td><td>Gérer plusieurs biens LMNP dans Nopillo</td><td>Ajouter un 2e bien · SIRET unique vs multiple · Déclarations séparées · Prorata charges communes</td></tr>
+    </tbody>
+  </table>
+
+  <!-- CAT 4 -->
+  <h3>📋 4. Valider et déposer ma déclaration</h3>
+  <table class="annexe-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Marqueur</th><th>Titre de l'article</th><th>Points clés à couvrir</th></tr></thead>
+    <tbody>
+      <tr><td class="tag-maj">✅ MAJ</td><td>📃 Comment lire ma liasse fiscale ?</td><td>MAJ avec exemples liasse V2 · Lien depuis l'email d'envoi · Explication des cases</td></tr>
+      <tr><td></td><td>🧑‍⚖️ Que se passe-t-il une fois que ma déclaration fiscale est validée sur Nopillo ?</td><td>Migrer · Clarifier le processus de télétransmission automatique</td></tr>
+      <tr><td></td><td>🧠 Vérification & récapitulatif : dernière étape avant la soumission</td><td>Migrer · MAJ V2</td></tr>
+      <tr><td></td><td>👌 Validation de votre saisie pour l'année fiscale en cours</td><td>Migrer · MAJ V2</td></tr>
+      <tr><td class="tag-maj">✅ MAJ</td><td>📝 Comment remplir la déclaration de revenus complémentaire (2042-C-PRO) ?</td><td>Renommer : "Reporter mon résultat Nopillo sur ma déclaration d'impôts" · Étapes pas-à-pas · Captures impots.gouv · Cas OGA</td></tr>
+      <tr><td></td><td>📋 Comment reporter son résultat fiscal sur sa déclaration de revenus personnelle ?</td><td>Fusionner avec l'article 2042-C-PRO · Garder 1 article unique</td></tr>
+      <tr><td></td><td>📥 Je reçois un mail indiquant que ma liasse a été rejetée, que faire ?</td><td>Migrer · Ajouter les causes les plus fréquentes de rejet</td></tr>
+      <tr><td></td><td>📆 Quel est le calendrier des échéances fiscales ?</td><td>Migrer · Mettre à jour avec les dates 2025/2026</td></tr>
+      <tr><td class="tag-p2">🆕 P2</td><td>Revenir sur une déclaration d'une année antérieure (rattrapage)</td><td>Délais autorisés · Procédure dans l'app · Impact sur cotisations et IR · Pénalités éventuelles</td></tr>
+      <tr><td></td><td>😰 Que faire si je n'ai pas télétransmis ma liasse fiscale avant le délai ?</td><td>Migrer · Mettre à jour les dates</td></tr>
+    </tbody>
+  </table>
+
+  <!-- CAT 5 -->
+  <h3>🧾 5. OGA, URSSAF & cotisations sociales</h3>
+  <table class="annexe-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Marqueur</th><th>Titre de l'article</th><th>Points clés à couvrir</th></tr></thead>
+    <tbody>
+      <tr><td class="tag-p1">🆕 P1</td><td>Je reçois un courrier OGI-France ou de l'URSSAF — que faire ?</td><td>Identifier le type de courrier · Que répondre · Délais · Contact URSSAF · Cas non-redevable</td></tr>
+      <tr><td class="tag-p1">🆕 P1</td><td>Comprendre mes cotisations sociales URSSAF en LMNP</td><td>Seuil de déclenchement · Calcul du montant · Différence OGA vs cotisations sociales · Affiliation pas-à-pas</td></tr>
+      <tr><td></td><td>Je dois m'affilier à l'URSSAF, comment faire ?</td><td>Migrer · Enrichir avec les démarches post-courrier OGI</td></tr>
+      <tr><td></td><td>⚖ Comment indiquer votre adhésion à un OGA dans Nopillo ?</td><td>Migrer · MAJ captures V2</td></tr>
+      <tr><td></td><td>📌 Est-ce que Nopillo est un OGA ? Qu'est-ce qu'un OGA ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>📖 Comment souscrire à l'OGA ? Guide pas à pas</td><td>Migrer · Actualiser si l'OGA partenaire a changé</td></tr>
+      <tr><td></td><td>🧮 Suis-je adhérent.e OGA ? Comment trouver mon numéro d'adhésion ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>💡 Mon numéro adhérent OGA n'est pas reconnu, que faire ?</td><td>Migrer · Enrichir avec les causes fréquentes d'erreur</td></tr>
+    </tbody>
+  </table>
+
+  <!-- CAT 6 -->
+  <h3>📜 6. Règles fiscales & statuts</h3>
+  <table class="annexe-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Marqueur</th><th>Titre de l'article</th><th>Points clés à couvrir</th></tr></thead>
+    <tbody>
+      <tr><td></td><td>🛋️ Qu'est-ce que le statut LMNP ?</td><td>Migrer · Compléter avec les nouveautés LF 2025</td></tr>
+      <tr><td></td><td>🗂 Qu'est-ce que le statut LMP ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>💰 Quelles sont les charges et amortissements déductibles ?</td><td>Migrer · Tableau récapitulatif par catégorie</td></tr>
+      <tr><td></td><td>💸 Comment est calculé mon déficit LMNP ?</td><td>Migrer · Fusionner avec la version LMP si pertinent</td></tr>
+      <tr><td></td><td>🖼️ Quels sont les régimes fiscaux en location nue ou meublée (LF 2025) ?</td><td>Migrer · Priorité post-Loi Le Meur</td></tr>
+      <tr><td></td><td>📜 FAQ Loi de Finances 2025 : plus-value LMNP + TVA</td><td>Migrer · Fusionner en 1 article "Impact LF 2025 sur le LMNP"</td></tr>
+      <tr><td></td><td>🗓️ Je fais de la location saisonnière (Airbnb, Booking) en LMNP</td><td>Migrer · Enrichir avec le calcul brut/net des loyers</td></tr>
+      <tr><td class="tag-p2">🆕 P2</td><td>Comprendre et utiliser mon déficit LMNP</td><td>Définition report déficit · Différence LMNP/LMP · Durée de report · Impact sur l'IR · Simulation</td></tr>
+      <tr><td></td><td>💸 Je vends mon bien immobilier en LMNP ou LMP, quelles conséquences fiscales ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>➗ Qu'est-ce que l'indivision ?</td><td>Migrer</td></tr>
+    </tbody>
+  </table>
+
+  <!-- CAT 7 -->
+  <h3>💳 7. Mon abonnement & facturation</h3>
+  <table class="annexe-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Marqueur</th><th>Titre de l'article</th><th>Points clés à couvrir</th></tr></thead>
+    <tbody>
+      <tr><td class="tag-p1">🆕 P1</td><td>Résilier mon abonnement ou clôturer mon activité LMNP</td><td>Procédure résiliation · Date d'effet · Conservation des données · Clôture greffe · Réactivation possible</td></tr>
+      <tr><td class="tag-p1">🆕 P1</td><td>Comprendre ma facture Nopillo et gérer mon abonnement</td><td>Trouver sa facture · Calcul du tarif · Renouvellement automatique · Modifier son CB · Contester un montant</td></tr>
+      <tr><td></td><td>🧾 Comment trouver ma facture Nopillo ?</td><td>Fusionner dans l'article facturation ci-dessus</td></tr>
+      <tr><td></td><td>🔃 Renouveler mon adhésion Nopillo</td><td>Migrer · Enrichir avec le cas du renouvellement automatique non souhaité</td></tr>
+    </tbody>
+  </table>
+
+  <!-- CAT 8 -->
+  <h3>🛠️ 8. Problèmes & dépannage</h3>
+  <table class="annexe-table" style="margin-bottom: 32px;">
+    <thead><tr><th>Marqueur</th><th>Titre de l'article</th><th>Points clés à couvrir</th></tr></thead>
+    <tbody>
+      <tr><td class="tag-maj">✅ MAJ</td><td>Connexion et accès à mon compte Nopillo (fusion ⌨️ + 🔑)</td><td>Mot de passe oublié · Changement d'email · Compte bloqué · Accès après résiliation · Support</td></tr>
+      <tr><td></td><td>👾 Nous soumettre un bug</td><td>Migrer · Ajouter une checklist avant de contacter le support</td></tr>
+      <tr><td></td><td>📥 Je reçois un mail indiquant que ma liasse a été rejetée</td><td>Migrer · Causes les plus fréquentes + résolution</td></tr>
+      <tr><td></td><td>🔙 Erreur lors du report sur la déclaration de revenus, comment la corriger ?</td><td>Migrer</td></tr>
+      <tr><td></td><td>❓ Messages d'erreur dans l'application (regrouper les 9 alertes)</td><td>Fusionner les 9 articles "🆘 Alerte : [charge]" en 1 article "Messages d'alertes dans Nopillo : que faire ?"</td></tr>
+    </tbody>
+  </table>
+
+</section>
+
+</main>
+
+<!-- CHARTS JS -->
+<script>
+Chart.defaults.color = '#6b7280';
+Chart.defaults.borderColor = '#e2e6ed';
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+// 1. TOP 15 CLUSTERS - Horizontal bars
+const ctxClusters = document.getElementById('chartClusters').getContext('2d');
+new Chart(ctxClusters, {
+  type: 'bar',
+  data: {
+    labels: [
+      'C01 — Immatriculation LMNP',
+      'C03 — Cotisations sociales / OGA',
+      'C04 — Liasse fiscale',
+      'C15 — Contact / Rappel sans question',
+      'C06 — Saisie dans l\'app',
+      'C11 — Accès compte',
+      'C14 — Aide déclaration générale',
+      'C10 — Charges déductibles',
+      'C12 — Facturation abonnement',
+      'C13 — Résiliation',
+      'C99 — Résiduel',
+      'C07 — Amortissements',
+      'C09 — Loyers / recettes',
+      'C05 — Report IR / 2042',
+      'C08 — Migration V2',
+    ],
+    datasets: [{
+      label: 'Volume de tickets',
+      data: [5012, 4221, 3759, 3353, 3242, 1649, 1492, 1522, 1431, 1369, 1356, 603, 563, 286, 359],
+      backgroundColor: [
+        '#ff6b6b','#ff6b6b','#ff9f43','#e8c96d','#ff9f43',
+        '#5b8dee','#51cf66','#ff9f43','#ff6b6b','#ff6b6b',
+        '#8892a4','#5b8dee','#5b8dee','#5b8dee','#ff9f43'
+      ],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: '#f0f2f5' }, ticks: { color: '#6b7280' } },
+      y: { grid: { display: false }, ticks: { color: '#111827', font: { size: 11 } } }
+    }
+  }
+});
+
+// 2. DONUT - Répartition corpus
+const ctxDonut = document.getElementById('chartDonut').getContext('2d');
+new Chart(ctxDonut, {
+  type: 'doughnut',
+  data: {
+    labels: ['Tickets clients analysés', 'Pré-classifiés (leads + internes)', 'Spam / auto', 'Cluster C99 résiduel', 'Rappel sans question'],
+    datasets: [{
+      data: [29519, 2975, 2409, 1356, 3353],
+      backgroundColor: ['#5b8dee','#ff9f43','#8892a4','#252a38','#e8c96d'],
+      borderWidth: 2,
+      borderColor: '#f5f6f8'
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { padding: 14, font: { size: 11 } } }
+    }
+  }
+});
+
+// 3. TOP FAQ
+const ctxTopFAQ = document.getElementById('chartTopFAQ').getContext('2d');
+new Chart(ctxTopFAQ, {
+  type: 'bar',
+  data: {
+    labels: [
+      'Formulaire 1447-C-SD',
+      'Compléter infos logement',
+      'SIREN : infos administratives',
+      'Qu\'est-ce que la CFE ?',
+      'Compte Impot.gouv.fr',
+      '751-SD Version C',
+      'Immatriculation LMNP',
+      'Date immatriculation DDA',
+      'Compléter vos dépenses',
+      '751-SD Version A',
+    ],
+    datasets: [{
+      label: 'Vues',
+      data: [1729, 1655, 1212, 1073, 971, 897, 896, 884, 879, 857],
+      backgroundColor: ['#ff9f43','#ff9f43','#51cf66','#51cf66','#5b8dee','#ff9f43','#51cf66','#51cf66','#ff9f43','#ff9f43'],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: '#f0f2f5' } },
+      y: { grid: { display: false }, ticks: { color: '#111827', font: { size: 10 } } }
+    }
+  }
+});
+
+// 4. SCATTER - Matrice 4 quadrants
+const ctxScatter = document.getElementById('chartScatter').getContext('2d');
+new Chart(ctxScatter, {
+  type: 'scatter',
+  data: {
+    datasets: [
+      {
+        label: '⭐ Stars (fort trafic + forte demande)',
+        data: [
+          {x: 1729, y: 5012, label: 'Formulaire 1447-C / Immatriculation'},
+          {x: 1655, y: 3242, label: 'Compléter infos logement'},
+          {x: 1212, y: 5012, label: 'SIREN info admin'},
+          {x: 879, y: 1522, label: 'Compléter dépenses'},
+          {x: 896, y: 5012, label: 'Immatriculation LMNP'},
+        ],
+        backgroundColor: '#e8c96d',
+        pointRadius: 8,
+      },
+      {
+        label: '🔴 Invisibles (faibles vues + forte demande)',
+        data: [
+          {x: 22, y: 1649, label: 'Accès compte'},
+          {x: 0, y: 4221, label: 'URSSAF assujettissement'},
+          {x: 334, y: 3759, label: 'Lire la liasse fiscale'},
+          {x: 1, y: 286, label: 'Remplir 2042-C-PRO'},
+          {x: 73, y: 1431, label: 'Trouver facture Nopillo'},
+        ],
+        backgroundColor: '#ff6b6b',
+        pointRadius: 8,
+      },
+      {
+        label: '💀 Fantômes (faibles vues + faible demande)',
+        data: [
+          {x: 6, y: 20, label: 'Alerte courtage'},
+          {x: 5, y: 20, label: 'Alerte gestion locative'},
+          {x: 2, y: 20, label: 'Alerte PNO'},
+          {x: 38, y: 30, label: 'Simulation impôts'},
+        ],
+        backgroundColor: '#8892a4',
+        pointRadius: 6,
+      },
+      {
+        label: '✅ OK (fort trafic, demande maîtrisée)',
+        data: [
+          {x: 971, y: 200, label: 'Compte Impot.gouv'},
+          {x: 556, y: 300, label: 'Statut fiscal et social'},
+          {x: 498, y: 300, label: 'S\'affilier URSSAF'},
+        ],
+        backgroundColor: '#51cf66',
+        pointRadius: 7,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { padding: 16, font: { size: 11 } } },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const d = ctx.raw;
+            return `${d.label || ''} — Vues: ${d.x} | Tickets: ${d.y}`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        title: { display: true, text: '← Vues FAQ →', color: '#6b7280' },
+        grid: { color: '#f0f2f5' },
+      },
+      y: {
+        title: { display: true, text: '← Volume tickets (demande) →', color: '#6b7280' },
+        grid: { color: '#f0f2f5' },
+      }
+    }
+  }
+});
+
+// 5. GROUPED BARS - Thématiques: tickets vs vues
+const ctxGrouped = document.getElementById('chartGrouped').getContext('2d');
+new Chart(ctxGrouped, {
+  type: 'bar',
+  data: {
+    labels: ['Immatriculation', 'Cotisations / OGA', 'Liasse fiscale', 'Saisie app', 'Charges', 'Facturation', 'Résiliation', 'Accès compte'],
+    datasets: [
+      {
+        label: 'Volume tickets (demande)',
+        data: [5207, 4221, 4045, 4766, 1522, 1431, 1369, 1649],
+        backgroundColor: '#ff9f43',
+        borderRadius: 3,
+      },
+      {
+        label: 'Vues FAQ (offre documentaire)',
+        data: [5750, 291+237+82+50+498, 334+82+381, 879+682+592+263+167+425, 148+205, 73, 0, 22+14],
+        backgroundColor: '#5b8dee',
+        borderRadius: 3,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 } } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#374151' } },
+      y: { grid: { color: '#f0f2f5' }, ticks: { color: '#6b7280' } }
+    }
+  }
+});
+
+// Smooth scroll for nav links
+document.querySelectorAll('.side-nav a[href^="#"]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// Active nav highlight on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      document.querySelectorAll('.side-nav a').forEach(a => a.classList.remove('active'));
+      const activeLink = document.querySelector(`.side-nav a[href="#${entry.target.id}"]`);
+      if (activeLink) activeLink.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -60% 0px' });
+
+document.querySelectorAll('.section[id]').forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
